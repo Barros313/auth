@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
+import authRouter from './routes/auth.js'
+
 dotenv.config();
 
 const app = express();
@@ -17,9 +19,7 @@ mongoose.connect(MONGO_URI)
     .then(() => console.log('Database connection established'))
     .catch((err) => console.err(err));
 
-app.get("/", (req, res) => {
-    res.send("Hello World!");
-});
+app.use('/auth', authRouter);
 
 app.listen(PORT, () => {
     console.log(`Server opened at port ${PORT}`);
