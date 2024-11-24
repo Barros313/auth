@@ -21,6 +21,10 @@ mongoose.connect(MONGO_URI)
 
 app.use('/auth', authRouter);
 
+app.get("/", (req, res) => {
+    res.send("Server running.");
+});
+
 app.listen(PORT, () => {
     console.log(`Server opened at port ${PORT}`);
 });
