@@ -1,1 +1,5 @@
 # Residência BidWeb
+
+## Branches
+
+- Simples
