@@ -6,19 +6,6 @@ const router = express.Router();
 const MAX_LOGIN_ATTEMPTS = 3;
 const LOCK_TIME = 2*60*60*1000;
 
-const formatDate = (date) => {
-    const pad = (num) => String(num).padStart(2, '0');
-
-    const year = date.get;
-    const month = pad(date.getMonth() + 1); // Months are zero-based
-    const day = pad(date.getDate());
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-    const seconds = pad(date.getSeconds());
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-};
-
 router.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
 
