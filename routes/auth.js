@@ -35,17 +35,26 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'User not found' });
         }
 
-        user.comparePassword(password, (err, isMatch) => {
-            if (err) throw err;
+        User.getAuthenticated(email, password, function (error, user, reason) {
+            if (error) throw error;
 
-            if (isMatch) {
-                console.log(`User ${user.name} (${user.email}) logged in`);
-                res.status(200).json({ user: { id: user._id, name: user.name, email: user.email } });
-            } else {
-                console.log(`${email} login failed. Passwords don't match`);
-                return res.status(401).json({ message: 'Wrong credentials' });                
+            if (user) {
+                console.log(`${email} logged in`);
+                return res.status(200).json({ message: 'Success!' });
+            }
+
+            let reasons = User.failedLogin;
+
+            switch (reason) {
+                case reasons.NOT_FOUND:
+                    break;
+                case reasons.PASSWORD_INCORRECT:
+                    break;
+                case reasons.MAX_ATTEMPTS:
+                    break;
             }
         });
+
     } catch(err) {
         console.error(err)
         res.status(500).json({ message: `Internal server error` });
