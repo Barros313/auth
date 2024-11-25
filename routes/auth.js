@@ -17,8 +17,13 @@ router.post('/register', async (req, res) => {
             return res.status(401).json({ message: 'User already exists' });
         } 
 
-        const newUser = new User({ name: name, email: email, password: password });
-        await newUser.save();
+        try {
+            const newUser = new User({ name: name, email: email, password: password });
+            await newUser.save();
+        } catch (error) {
+            console.log(`${email} failed to register due to wrong password format.`);
+            return res.status(400).json({ message: `${error.message}` });
+        }
 
         console.log(`User ${name} registered successfully`);
         return res.status(200).json({ message: `User registered successfully` });
