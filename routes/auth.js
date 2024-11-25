@@ -35,7 +35,7 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, token } = req.body;
 
     try {
         const user = await User.findOne({ email });
@@ -55,6 +55,19 @@ router.post('/login', async (req, res) => {
         const isMatch = await user.comparePassword(password);
 
         if (isMatch) {
+            if (user.twoFactorEnabled) {
+                const verify = speakeasy.totp.verify({
+                    secret: user.twoFactorSecret,
+                    encoding: 'base32',
+                    token
+                });
+
+                if (!verify) {
+                    console.log(`${email} invalid 2FA token.`);
+                    return res.status(401).json({ message: 'Invalid 2FA token' });
+                }
+            }
+
             user.loginAttempts = 0;
             user.lockUntil = null;
             await user.save();
