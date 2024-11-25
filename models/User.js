@@ -17,12 +17,20 @@ UserSchema.virtual('isLocked').get(function () {
     return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
-UserSchema.pre('save', function (next) { 
+UserSchema.pre('save', async function (next) { 
     const user = this;
 
     if (!user.isModified('password')) return next();
 
-    bcrypt.genSalt(SALT_WORK_FACTOR, (error, salt) => {
+    try {
+        const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
+        user.password = await bcrypt.hash(user.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
+
+    /* bcrypt.genSalt(SALT_WORK_FACTOR, (error, salt) => {
         if (error) return next(error);
 
         // Encripta senha com "sal" gerado
@@ -33,7 +41,7 @@ UserSchema.pre('save', function (next) {
             user.password = hash;
             next();
         });
-    });
+    }); */
 });
 
 UserSchema.methods.comparePassword = function (inputPassword, callback) {
