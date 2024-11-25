@@ -2,8 +2,6 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const SALT_WORK_FACTOR = process.env.SALT_WORK_FACTOR;
-const MAX_LOGIN_ATTEMPTS = process.env.MAX_LOGIN_ATTEMPTS;
-const LOCK_TIME = process.env.LOCK_TIME;
 
 const UserSchema = new mongoose.Schema(
     {
