@@ -9,13 +9,7 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { 
         type: String, 
-        required: true,
-        validate: {
-            validator: function (value) {
-                return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
-            },
-            message: 'Password must be at least 8 characters long and contain at least one letter, one number and one special character'
-        } 
+        required: true 
     },
     loginAttempts: { type: Number, required: true, default: 0 },
     lockUntil: { type: Number },
@@ -31,8 +25,13 @@ UserSchema.virtual('isLocked').get(function () {
 
 UserSchema.pre('save', function (next) { 
     const user = this;
-
     if (!user.isModified('password')) return next();
+
+    const passwordValidationRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passwordValidationRegex.test(user.password)) {
+        return next(new Error('Password must be at least 8 characters long and contain at least one letter, one number, and one special character.'));
+    }
 
     bcrypt.genSalt(SALT_WORK_FACTOR, (error, salt) => {
         if (error) return next(error);
