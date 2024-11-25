@@ -18,7 +18,9 @@ const UserSchema = new mongoose.Schema(
         } 
     },
     loginAttempts: { type: Number, required: true, default: 0 },
-    lockUntil: { type: Number }
+    lockUntil: { type: Number },
+    twoFactorEnabled: { type: Boolean, default: false },
+    twoFactorSecret: { type: String }
     },
     { timestamps: true }
 );
