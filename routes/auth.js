@@ -58,8 +58,8 @@ router.post('/login', async (req, res) => {
         } else {
             user.loginAttempts += 1;
 
-            if (user.loginAttempts >= 3) {
-                user.lockUntil = new Date(Date.now() + 2*60*60*1000);
+            if (user.loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+                user.lockUntil = new Date(Date.now() + LOCK_TIME);
                 console.log(`User ${user.email} is now locked out.`);
             }
 
