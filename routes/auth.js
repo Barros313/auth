@@ -1,4 +1,5 @@
 import express from 'express';
+import speakeasy from 'speakeasy';
 import User from '../models/User.js';
 
 const router = express.Router();
@@ -76,6 +77,50 @@ router.post('/login', async (req, res) => {
     } catch(err) {
         console.error(err)
         res.status(500).json({ message: `Internal server error` });
+    }
+});
+
+router.post('/2fa/setup', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) res.status(400).json({ message: 'User not found' });
+        
+        const secret = speakeasy.generateSecret({ name: `Auth (${email})` });
+        user.twoFactorSecret = secret.base32;
+        
+        await user.save();
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.post('/2fa/verify', async (req, res) => {
+    const { email, token } = req.body;
+    
+    try {
+        const user = await User.findOne({ email });
+        if (!user) res.status(400).json({ message: 'User not found' });
+
+        const verify = speakeasy.totp.verify({
+            secret: user.twoFactorSecret,
+            encoding: 'base32',
+            token
+        });
+
+        if (verify) {
+            user.twoFactorEnabled = true;
+
+            await user.save();
+            res.status(200).json({ message: '2FA enabled successfully' });
+        } else {
+            res.status(400).json({ message: 'Invalid 2FA token' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
