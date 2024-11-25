@@ -104,6 +104,12 @@ router.post('/2fa/setup', async (req, res) => {
         user.twoFactorSecret = secret.base32;
         
         await user.save();
+
+        res.status(200).json({
+            message: '2FA setup successful',
+            setupKey: secret.base32
+        })
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Internal server error' });
